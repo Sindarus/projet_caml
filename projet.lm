@@ -1,4 +1,4 @@
-type rect = {Top : int; Bottom : int; Right : int; Left : int};;
+type rect = {top : int; bottom : int; right : int; left : int};;
 
 type pquadtree =
 PEmpty | PNoeud of point * rect * pquadtree * pquadtree * pquadtree * pquadtree;;
