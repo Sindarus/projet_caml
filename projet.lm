@@ -5,3 +5,9 @@ type point = {x : int; y : int};;
 type pquadtree =
 PEmpty | PNoeud of point * rect * pquadtree * pquadtree * pquadtree * pquadtree;;
 
+let new_pquadtree = fun n ->
+    PNoeud({x=0;y=0}, {left=0; bottom=0; top=n; right=n}, PEmpty, PEmpty, PEmpty, PEmpty)
+;;
+
+(* tests *)
+let p = new_pquadtree 100;;
