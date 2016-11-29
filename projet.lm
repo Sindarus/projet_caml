@@ -11,8 +11,27 @@ let get_centre = fun r ->
     {x = (r.right - r.left) / 2 ; y = (r.top - r.bottom) / 2}
 ;;
 
+(* Renvoie un pquadtree de couverture n*n *)
 let new_pquadtree = fun n ->
     PNoeud({x=0;y=0}, {left=0; bottom=0; top=n; right=n}, PEmpty, PEmpty, PEmpty, PEmpty)
+;;
+
+(* Prend un pquadtree et un point, renvoie le numéro du cadran de ce pquadtree
+   dans lequel se trouve le point. Attention, cela ne signifie pas que le
+   pquadtree a déja été partitionné : p1, p2, p3 et p4 sont peut être pas
+   initialisé.
+   Renvoie 0 si le pquadtree passé est Empty*)
+let get_cadr_num_pt = fun tree point ->
+    match tree with
+        | PEmpty -> 0
+        | PNoeud(p, r, p1, p2, p3, p4) -> let centre = (get_centre r) in
+            match point.x with
+                | x when x < centre.x -> ( match point.y with
+                    | y when y < centre.y -> 3
+                    | y                   -> 1 )
+                | x                   -> ( match point.y with
+                    | y when y < centre.y -> 4
+                    | y                   -> 2 )
 ;;
 
 (* tests *)
