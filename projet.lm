@@ -1,5 +1,7 @@
 type rect = {top : int; bottom : int; right : int; left : int};;
 
+type point = {x : int; y : int};;
+
 type pquadtree =
 PEmpty | PNoeud of point * rect * pquadtree * pquadtree * pquadtree * pquadtree;;
 
