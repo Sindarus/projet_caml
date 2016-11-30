@@ -16,14 +16,22 @@ let new_pquadtree = fun n ->
     PNoeud({x=0;y=0}, {left=0; bottom=0; top=n; right=n}, PEmpty, PEmpty, PEmpty, PEmpty)
 ;;
 
+let hors_rect = fun r point ->
+    point.x > r.right || point.x < r.left || point.y > r.top || point.y < r.bottom
+;;
+
 (* Prend un pquadtree et un point, renvoie le numéro du cadran de ce pquadtree
-   dans lequel se trouve le point. Attention, cela ne signifie pas que le
+   dans lequel se trouve le point.
+   Attention, cela ne signifie pas que le
    pquadtree a déja été partitionné : p1, p2, p3 et p4 sont peut être pas
    initialisé.
-   Renvoie 0 si le pquadtree passé est Empty*)
+   Renvoie 0 si le point n'appartient pas au quadtree. C'est a dire 1) si le
+   quadtree passé en premier lieu est PEmpty, ou si le point est hors de sa
+   couverture. *)
 let get_cadr_num_pt = fun tree point ->
     match tree with
         | PEmpty -> 0
+        | PNoeud(p, r, p1, p2, p3, p4) when (hors_rect r point) -> 0
         | PNoeud(p, r, p1, p2, p3, p4) -> let centre = (get_centre r) in
             match point.x with
                 | x when x < centre.x -> ( match point.y with
