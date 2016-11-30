@@ -45,7 +45,7 @@ let get_cadr_num_pt = fun tree point ->
 (* Renvoie true si le point est une valeur dans tree.
    Attention, c'est une notion différente de « si le point est couvert par
    l'arbre » *)
-let rec pappartient = fun tree point->
+let rec pappartient = fun tree point ->
     match tree with
         | PEmpty -> false
         | PNoeud(p, r, p1, p2, p3, p4) when p = point -> true
@@ -57,6 +57,22 @@ let rec pappartient = fun tree point->
                 | 3 -> pappartient p3 point
                 | 4 -> pappartient p4 point
                 | _ -> failwith "Pas possible"
+;;
+
+(* Renvoie une liste des cadrans qu'il faut parcourir pour aboutir a point.
+   Il faut que point soit dans tree. *)
+let rec pchemin = fun tree point ->
+    match tree with
+        | PEmpty -> failwith "point n'est pas dans tree"
+        | PNoeud(p, r, p1, p2, p3, p4) when p = point -> []
+        | PNoeud(p, r, p1, p2, p3, p4) ->
+            let cadr_num = get_cadr_num_pt tree point in match cadr_num with
+                | 0 -> failwith "point n'est pas dans tree 2"
+                | 1 -> "NO" :: (pchemin p1 point)
+                | 2 -> "NE" :: (pchemin p2 point)
+                | 3 -> "SO" :: (pchemin p3 point)
+                | 4 -> "NE" :: (pchemin p4 point)
+                | _ -> failwith "Pas possible2"
 ;;
 
 (* tests *)
