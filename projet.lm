@@ -16,15 +16,15 @@ let new_pquadtree = fun n ->
     PNoeud({x=0;y=0}, {left=0; bottom=0; top=n; right=n}, PEmpty, PEmpty, PEmpty, PEmpty)
 ;;
 
+(* Renvoie true si point est hors de la couverture du rect r *)
 let hors_rect = fun r point ->
     point.x > r.right || point.x < r.left || point.y > r.top || point.y < r.bottom
 ;;
 
 (* Prend un pquadtree et un point, renvoie le numéro du cadran de ce pquadtree
    dans lequel se trouve le point.
-   Attention, cela ne signifie pas que le
-   pquadtree a déja été partitionné : p1, p2, p3 et p4 sont peut être pas
-   initialisé.
+   Attention, cela ne signifie pas que le pquadtree a déja été partitionné :
+   p1, p2, p3 et p4 sont peut être pas initialisé.
    Renvoie 0 si le point n'appartient pas au quadtree. C'est a dire 1) si le
    quadtree passé en premier lieu est PEmpty, ou si le point est hors de sa
    couverture. *)
@@ -40,6 +40,23 @@ let get_cadr_num_pt = fun tree point ->
                 | x                   -> ( match point.y with
                     | y when y < centre.y -> 4
                     | y                   -> 2 )
+;;
+
+(* Renvoie true si le point est une valeur dans tree.
+   Attention, c'est une notion différente de « si le point est couvert par
+   l'arbre » *)
+let rec pappartient = fun tree point->
+    match tree with
+        | PEmpty -> false
+        | PNoeud(p, r, p1, p2, p3, p4) when p = point -> true
+        | PNoeud(p, r, p1, p2, p3, p4) ->
+            let cadr_num = get_cadr_num_pt tree point in match cadr_num with
+                | 0 -> false
+                | 1 -> pappartient p1 point
+                | 2 -> pappartient p2 point
+                | 3 -> pappartient p3 point
+                | 4 -> pappartient p4 point
+                | _ -> failwith "Pas possible"
 ;;
 
 (* tests *)
