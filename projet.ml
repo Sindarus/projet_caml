@@ -78,3 +78,4 @@ let rec pchemin = fun tree point ->
 (* tests *)
 let p = new_pquadtree 100;;
 let centre = let PNoeud(x, r, p1, p2, p3, p4) = p in (get_centre r);;
+
