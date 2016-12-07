@@ -24,7 +24,7 @@ let hors_rect = fun r point ->
 (* Prend un pquadtree et un point, renvoie le numéro du cadran de ce pquadtree
    dans lequel se trouve le point.
    Attention, cela ne signifie pas que le pquadtree a déja été partitionné :
-   p1, p2, p3 et p4 sont peut être pas initialisé.
+   p1, p2, p3 et p4 ne sont peut être pas initialisés.
    Renvoie 0 si le point n'appartient pas au quadtree. C'est a dire 1) si le
    quadtree passé en premier lieu est PEmpty, ou 2) si le point est hors de sa
    couverture. *)
