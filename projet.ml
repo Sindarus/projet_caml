@@ -6,111 +6,113 @@ type pquadtree =
 PEmpty | PNoeud of point * rect * pquadtree * pquadtree * pquadtree * pquadtree;;
 
 
-(* Prend un rect et renvoie le point central du rect*)
-let get_centre = fun r ->
+(* Takes a 'rect' and returns the central point of that rectangle *)
+let get_center = fun r ->
     {x = (r.right - r.left) / 2 ; y = (r.top - r.bottom) / 2}
 ;;
 
-(* Renvoie un pquadtree de couverture n*n *)
+(* Returns a pquadtree that has n*n for support rectangle *)
 let new_pquadtree = fun n ->
     PNoeud({x=0;y=0}, {left=0; bottom=0; top=n; right=n}, PEmpty, PEmpty, PEmpty, PEmpty)
 ;;
 
-(* Renvoie true si point est hors de la couverture du rect r *)
-let hors_rect = fun r point ->
-    point.x > r.right || point.x < r.left || point.y > r.top || point.y < r.bottom
+(* Returns true if point is outside the rect rectangle *)
+let out_rect = fun rect point ->
+    point.x > rect.right || point.x < rect.left || point.y > rect.top || point.y < rect.bottom
 ;;
 
-(* Prend un pquadtree et un point, renvoie le numéro du cadran de ce pquadtree
-   dans lequel se trouve le point.
-   Attention, cela ne signifie pas que le pquadtree a déja été partitionné :
-   p1, p2, p3 et p4 ne sont peut être pas initialisés.
-   Renvoie 0 si le point n'appartient pas au quadtree. C'est a dire 1) si le
-   quadtree passé en premier lieu est PEmpty, ou 2) si le point est hors de sa
-   couverture. *)
-let get_cadr_num_pt = fun tree point ->
+(* From a pquadtree and a point, this function returns the number of the
+   square in which the point is.
+   This does not mean that the pquadtree has been splitted yet :
+   p1, p2, p3 et p4 can be uninitialized.
+   This function returns 0 if the point cannot be contained by the tree.
+   That means 1) when tree is PEmpty 2) when point is outside of tree's
+   support rectangle *)
+let get_squ_num_pt = fun tree point ->
     match tree with
         | PEmpty -> 0
-        | PNoeud(p, r, p1, p2, p3, p4) when (hors_rect r point) -> 0
-        | PNoeud(p, r, p1, p2, p3, p4) -> let centre = (get_centre r) in
+        | PNoeud(p, r, p1, p2, p3, p4) when (out_rect r point) -> 0
+        | PNoeud(p, r, p1, p2, p3, p4) -> let center = (get_center r) in
             match point.x with
-                | x when x < centre.x -> ( match point.y with
-                    | y when y < centre.y -> 3
+                | x when x < center.x -> ( match point.y with
+                    | y when y < center.y -> 3
                     | y                   -> 1 )
                 | x                   -> ( match point.y with
-                    | y when y < centre.y -> 4
+                    | y when y < center.y -> 4
                     | y                   -> 2 )
 ;;
 
-(* Renvoie true si le point est une valeur dans tree.
-   Attention, c'est une notion différente de « si le point est couvert par
-   l'arbre » *)
-let rec pappartient = fun tree point ->
+(* Returns true if the point is a value of tree.
+   Careful : this is different from knowing weather the point is supported
+   by the tree's support rectangle *)
+let rec pbelong = fun tree point ->
     match tree with
         | PEmpty -> false
         | PNoeud(p, r, p1, p2, p3, p4) when p = point -> true
         | PNoeud(p, r, p1, p2, p3, p4) ->
-            let cadr_num = get_cadr_num_pt tree point in match cadr_num with
+            let cadr_num = get_squ_num_pt tree point in match cadr_num with
                 | 0 -> false
-                | 1 -> pappartient p1 point
-                | 2 -> pappartient p2 point
-                | 3 -> pappartient p3 point
-                | 4 -> pappartient p4 point
-                | _ -> failwith "Pas possible"
+                | 1 -> pbelong p1 point
+                | 2 -> pbelong p2 point
+                | 3 -> pbelong p3 point
+                | 4 -> pbelong p4 point
+                | _ -> failwith "pbelong: Not possible"
 ;;
 
-(* Renvoie une liste des cadrans qu'il faut parcourir pour aboutir a point.
-   Il faut que point soit dans tree. *)
-let rec pchemin = fun tree point ->
+(* Returns the list of squares you have to go through in order to reach
+   point, given that point is a value of tree. *)
+let rec ppath = fun tree point ->
     match tree with
-        | PEmpty -> failwith "point n'est pas dans tree"
+        | PEmpty -> failwith "ppath: point is not in tree"
         | PNoeud(p, r, p1, p2, p3, p4) when p = point -> []
         | PNoeud(p, r, p1, p2, p3, p4) ->
-            let cadr_num = get_cadr_num_pt tree point in match cadr_num with
-                | 0 -> failwith "point n'est pas dans tree 2"
-                | 1 -> "NO" :: (pchemin p1 point)
-                | 2 -> "NE" :: (pchemin p2 point)
-                | 3 -> "SO" :: (pchemin p3 point)
-                | 4 -> "NE" :: (pchemin p4 point)
-                | _ -> failwith "Pas possible2"
+            let cadr_num = get_squ_num_pt tree point in match cadr_num with
+                | 0 -> failwith "ppath: point is not in tree 2"
+                | 1 -> "NO" :: (ppath p1 point)
+                | 2 -> "NE" :: (ppath p2 point)
+                | 3 -> "SO" :: (ppath p3 point)
+                | 4 -> "NE" :: (ppath p4 point)
+                | _ -> failwith "ppath: not possible"
 ;;
 
-(* get rect formed if you take the cadr'th cadr of r *)
-let get_rect_cadr = fun r cadr ->
-    let c = get_centre r in
-    match cadr with
-        | 1 -> {top = r.top ; left = r.left ; right = c.x ; bottom = c.y}
-        | 2 -> {top = r.top ; right = r.right ; left = c.x ; bottom = c.y}
-        | 3 -> {bottom = r.bottom ; left = r.left ; top = c.y ; right = c.x}
-        | 4 -> {bottom = r.bottom ; right = r.right ; top = c.y ; left = c.x}
-        | _ -> failwith "get_rect_cadr : valeur non autorisée"
+(* Get the squ'th square of rect *)
+let get_rect_squ = fun rect squ ->
+    let c = get_center rect in
+    match squ with
+        | 1 -> {top = rect.top ; left = rect.left ; right = c.x ; bottom = c.y}
+        | 2 -> {top = rect.top ; right = rect.right ; left = c.x ; bottom = c.y}
+        | 3 -> {bottom = rect.bottom ; left = rect.left ; top = c.y ; right = c.x}
+        | 4 -> {bottom = rect.bottom ; right = rect.right ; top = c.y ; left = c.x}
+        | _ -> failwith "get_rect_squ: the value you provided for squ is unauthorized"
 ;;
 
-(* Return an empty node that has point p and support rect*)
+(* Returns an empty node that has p for point and rect for support rectangle *)
 let new_node = fun p r ->
     PNoeud(p, r, PEmpty, PEmpty, PEmpty, PEmpty)
 ;;
 
-let rec insere = fun tree point ->
+(* Given a tree that is not PEmpty and a point, this function splits the deepest square
+   in tree whose support rectangle supports point, by adding a pquadtree there,
+   that has point for value *)
+let rec insert = fun tree point ->
     match tree with
-        | PEmpty -> failwith "insere : tree est vide"
+        | PEmpty -> failwith "insert: tree is empty"
         | PNoeud(p, r, p1, p2, p3, p4) when p = point ->
-            failwith "insere : point est déja dans tree"
+            failwith "insert: point is already in tree"
         | PNoeud(p, r, p1, p2, p3, p4) ->
-            let cadr_num = (get_cadr_num_pt tree point) in match cadr_num with
-                | 0 -> failwith "insere : point pas couvert par tree"
-                | 1 when p1 = PEmpty -> PNoeud(p, r, new_node (point) (get_rect_cadr tree 1), p2, p3, p4)
-                | 1 -> PNoeud(p, r, insere p1 point, p2, p3, p4)
-                | 2 when p2 = PEmpty -> PNoeud(p, r, p1, new_node point (get_rect_cadr tree 2), p3, p4)
-                | 2 -> PNoeud(p, r, p1, insere p2 point, p3, p4)
-                | 3 when p3 = PEmpty -> PNoeud(p, r, p1, p2, new_node point (get_rect_cadr tree 3), p4)
-                | 3 -> PNoeud(p, r, p1, p2, insere p3 point, p4)
-                | 2 when p4 = PEmpty -> PNoeud(p, r, p1, p2, p3, new_node point (get_rect_cadr tree 4))
-                | 4 -> PNoeud(p, r, p1, p2, p3, insere p4 point)
-                | _ -> failwith "insere : Pas possible"
+            let cadr_num = (get_squ_num_pt tree point) in match cadr_num with
+                | 0 -> failwith "insert: point is not supported by tree's support rectangle"
+                | 1 when p1 = PEmpty -> PNoeud(p, r, new_node (point) (get_rect_squ r 1), p2, p3, p4)
+                | 1 -> PNoeud(p, r, insert p1 point, p2, p3, p4)
+                | 2 when p2 = PEmpty -> PNoeud(p, r, p1, new_node (point) (get_rect_squ r 2), p3, p4)
+                | 2 -> PNoeud(p, r, p1, insert p2 point, p3, p4)
+                | 3 when p3 = PEmpty -> PNoeud(p, r, p1, p2, new_node (point) (get_rect_squ r 3), p4)
+                | 3 -> PNoeud(p, r, p1, p2, insert p3 point, p4)
+                | 4 when p4 = PEmpty -> PNoeud(p, r, p1, p2, p3, new_node (point) (get_rect_squ r 4))
+                | 4 -> PNoeud(p, r, p1, p2, p3, insert p4 point)
+                | _ -> failwith "insert: Not possible"
 ;;
 
 (* tests *)
 let p = new_pquadtree 100;;
-let centre = let PNoeud(x, r, p1, p2, p3, p4) = p in (get_centre r);;
-
+let center = let PNoeud(x, r, p1, p2, p3, p4) = p in (get_center r);;
