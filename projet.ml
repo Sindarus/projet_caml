@@ -26,7 +26,7 @@ let hors_rect = fun r point ->
    Attention, cela ne signifie pas que le pquadtree a déja été partitionné :
    p1, p2, p3 et p4 sont peut être pas initialisé.
    Renvoie 0 si le point n'appartient pas au quadtree. C'est a dire 1) si le
-   quadtree passé en premier lieu est PEmpty, ou si le point est hors de sa
+   quadtree passé en premier lieu est PEmpty, ou 2) si le point est hors de sa
    couverture. *)
 let get_cadr_num_pt = fun tree point ->
     match tree with
@@ -73,6 +73,41 @@ let rec pchemin = fun tree point ->
                 | 3 -> "SO" :: (pchemin p3 point)
                 | 4 -> "NE" :: (pchemin p4 point)
                 | _ -> failwith "Pas possible2"
+;;
+
+(* get rect formed if you take the cadr'th cadr of r *)
+let get_rect_cadr = fun r cadr ->
+    let c = get_centre r in
+    match cadr with
+        | 1 -> {top = r.top ; left = r.left ; right = c.x ; bottom = c.y}
+        | 2 -> {top = r.top ; right = r.right ; left = c.x ; bottom = c.y}
+        | 3 -> {bottom = r.bottom ; left = r.left ; top = c.y ; right = c.x}
+        | 4 -> {bottom = r.bottom ; right = r.right ; top = c.y ; left = c.x}
+        | _ -> failwith "get_rect_cadr : valeur non autorisée"
+;;
+
+(* Return an empty node that has point p and support rect*)
+let new_node = fun p r ->
+    PNoeud(p, r, PEmpty, PEmpty, PEmpty, PEmpty)
+;;
+
+let rec insere = fun tree point ->
+    match tree with
+        | PEmpty -> failwith "insere : tree est vide"
+        | PNoeud(p, r, p1, p2, p3, p4) when p = point ->
+            failwith "insere : point est déja dans tree"
+        | PNoeud(p, r, p1, p2, p3, p4) ->
+            let cadr_num = (get_cadr_num_pt tree point) in match cadr_num with
+                | 0 -> failwith "insere : point pas couvert par tree"
+                | 1 when p1 = PEmpty -> PNoeud(p, r, new_node (point) (get_rect_cadr tree 1), p2, p3, p4)
+                | 1 -> PNoeud(p, r, insere p1 point, p2, p3, p4)
+                | 2 when p2 = PEmpty -> PNoeud(p, r, p1, new_node point (get_rect_cadr tree 2), p3, p4)
+                | 2 -> PNoeud(p, r, p1, insere p2 point, p3, p4)
+                | 3 when p3 = PEmpty -> PNoeud(p, r, p1, p2, new_node point (get_rect_cadr tree 3), p4)
+                | 3 -> PNoeud(p, r, p1, p2, insere p3 point, p4)
+                | 2 when p4 = PEmpty -> PNoeud(p, r, p1, p2, p3, new_node point (get_rect_cadr tree 4))
+                | 4 -> PNoeud(p, r, p1, p2, p3, insere p4 point)
+                | _ -> failwith "insere : Pas possible"
 ;;
 
 (* tests *)
