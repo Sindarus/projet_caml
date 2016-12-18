@@ -6,11 +6,11 @@ module Pqt =
 
     type pquadtree =
       | PEmpty
-      | PNoeud of point * rect * pquadtree * pquadtree * pquadtree * pquadtree
+      | PNode of point * rect * pquadtree * pquadtree * pquadtree * pquadtree
 
     (* Returns a pquadtree that has n*n for support rectangle *)
     let new_pquadtree = fun n ->
-      PNoeud({x=0; y=0},
+      PNode({x=0; y=0},
            {left=0; bottom=0; top=n; right=n},
            PEmpty, PEmpty, PEmpty, PEmpty)
 
@@ -35,8 +35,8 @@ module Pqt =
     let get_squ_num_pt = fun tree point ->
       match tree with
         | PEmpty -> 0
-        | PNoeud(p, r, p1, p2, p3, p4) when (out_rect r point) -> 0
-        | PNoeud(p, r, p1, p2, p3, p4) -> let center = (get_center r) in
+        | PNode(p, r, p1, p2, p3, p4) when (out_rect r point) -> 0
+        | PNode(p, r, p1, p2, p3, p4) -> let center = (get_center r) in
           match point.x with
             | x when x < center.x -> ( match point.y with
               | y when y < center.y -> 3
@@ -46,13 +46,13 @@ module Pqt =
               | y           -> 2 )
 
     (* Returns true if the point is a value of tree.
-       Careful : this is different from knowing weather the point is supported
+       Careful : this is different from knowing whether the point is supported
        by the tree's support rectangle *)
     let rec pbelong = fun tree point ->
       match tree with
         | PEmpty -> false
-        | PNoeud(p, r, p1, p2, p3, p4) when p = point -> true
-        | PNoeud(p, r, p1, p2, p3, p4) ->
+        | PNode(p, r, p1, p2, p3, p4) when p = point -> true
+        | PNode(p, r, p1, p2, p3, p4) ->
           let cadr_num = get_squ_num_pt tree point in match cadr_num with
             | 0 -> false
             | 1 -> pbelong p1 point
@@ -66,17 +66,17 @@ module Pqt =
     let rec ppath = fun tree point ->
       match tree with
         | PEmpty -> failwith "ppath: point is not in tree"
-        | PNoeud(p, r, p1, p2, p3, p4) when p = point -> []
-        | PNoeud(p, r, p1, p2, p3, p4) ->
+        | PNode(p, r, p1, p2, p3, p4) when p = point -> []
+        | PNode(p, r, p1, p2, p3, p4) ->
           let cadr_num = get_squ_num_pt tree point in match cadr_num with
             | 0 -> failwith "ppath: point is not in tree 2"
-            | 1 -> "NO" :: (ppath p1 point)
+            | 1 -> "NW" :: (ppath p1 point)
             | 2 -> "NE" :: (ppath p2 point)
-            | 3 -> "SO" :: (ppath p3 point)
+            | 3 -> "SW" :: (ppath p3 point)
             | 4 -> "NE" :: (ppath p4 point)
             | _ -> failwith "ppath: not possible"
 
-    (* Get the squ'th square of rect *)
+    (* Get the squ'th square of rect, where squ is a number between 1 and 4 *)
     let get_rect_squ = fun rect squ ->
       let c = get_center rect in
       match squ with
@@ -88,7 +88,7 @@ module Pqt =
 
     (* Returns an empty node that has p for point and rect for support rectangle *)
     let new_node = fun p r ->
-      PNoeud(p, r, PEmpty, PEmpty, PEmpty, PEmpty)
+      PNode(p, r, PEmpty, PEmpty, PEmpty, PEmpty)
 
     (* Given a tree that is not PEmpty and a point, this function splits the deepest square
        in tree whose support rectangle supports point, by adding a pquadtree there,
@@ -96,24 +96,24 @@ module Pqt =
     let rec insert = fun tree point ->
       match tree with
         | PEmpty -> failwith "insert: tree is empty"
-        | PNoeud(p, r, p1, p2, p3, p4) when p = point ->
+        | PNode(p, r, p1, p2, p3, p4) when p = point ->
           failwith "insert: point is already in tree"
-        | PNoeud(p, r, p1, p2, p3, p4) ->
+        | PNode(p, r, p1, p2, p3, p4) ->
           let cadr_num = (get_squ_num_pt tree point) in match cadr_num with
             | 0 -> failwith "insert: point is not supported by tree's support rectangle"
-            | 1 when p1 = PEmpty -> PNoeud(p, r, new_node (point) (get_rect_squ r 1), p2, p3, p4)
-            | 1 -> PNoeud(p, r, insert p1 point, p2, p3, p4)
-            | 2 when p2 = PEmpty -> PNoeud(p, r, p1, new_node (point) (get_rect_squ r 2), p3, p4)
-            | 2 -> PNoeud(p, r, p1, insert p2 point, p3, p4)
-            | 3 when p3 = PEmpty -> PNoeud(p, r, p1, p2, new_node (point) (get_rect_squ r 3), p4)
-            | 3 -> PNoeud(p, r, p1, p2, insert p3 point, p4)
-            | 4 when p4 = PEmpty -> PNoeud(p, r, p1, p2, p3, new_node (point) (get_rect_squ r 4))
-            | 4 -> PNoeud(p, r, p1, p2, p3, insert p4 point)
+            | 1 when p1 = PEmpty -> PNode(p, r, new_node (point) (get_rect_squ r 1), p2, p3, p4)
+            | 1 -> PNode(p, r, insert p1 point, p2, p3, p4)
+            | 2 when p2 = PEmpty -> PNode(p, r, p1, new_node (point) (get_rect_squ r 2), p3, p4)
+            | 2 -> PNode(p, r, p1, insert p2 point, p3, p4)
+            | 3 when p3 = PEmpty -> PNode(p, r, p1, p2, new_node (point) (get_rect_squ r 3), p4)
+            | 3 -> PNode(p, r, p1, p2, insert p3 point, p4)
+            | 4 when p4 = PEmpty -> PNode(p, r, p1, p2, p3, new_node (point) (get_rect_squ r 4))
+            | 4 -> PNode(p, r, p1, p2, p3, insert p4 point)
             | _ -> failwith "insert: Not possible"
   end;;
 
 (* tests *)
 (*
 let p = Pqt.new_pquadtree 100;;
-let center = let Pqt.PNoeud(x, r, p1, p2, p3, p4) = p in (Pqt.get_center r);;
+let center = let Pqt.PNode(x, r, p1, p2, p3, p4) = p in (Pqt.get_center r);;
 *)

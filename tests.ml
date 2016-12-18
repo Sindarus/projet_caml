@@ -4,7 +4,7 @@ open Pqt;;
 let test_new_pquadtree () =
   let a = new_pquadtree 10 in
   match a with
-    | PNoeud(p, r, p1, p2, p3, p4) ->
+    | PNode(p, r, p1, p2, p3, p4) ->
       if not (p = {x = 0; y = 0}) ||
          not (r = {left=0; bottom=0; top=10; right=10}) ||
          not (p1 = PEmpty) ||
@@ -42,15 +42,15 @@ let test_get_squ_num_pt () =
 
 let test_pbelong () =
   let p =
-    PNoeud(
+    PNode(
       {x = 0; y = 0},
       {top = 10; bottom = 0; right = 10; left = 0},
-      PNoeud(
+      PNode(
         {x = 3; y = 9},
         {top = 10; bottom = 5; right = 5; left = 0},
         PEmpty, PEmpty, PEmpty, PEmpty),
       PEmpty,
-      PNoeud(
+      PNode(
         {x = 1; y = 2},
         {top = 5; bottom = 0; right = 5; left = 0},
         PEmpty, PEmpty, PEmpty, PEmpty),
@@ -66,23 +66,23 @@ let test_pbelong () =
 
 let test_ppath () =
   let p =
-    PNoeud(
+    PNode(
       {x = 0; y = 0},
       {top = 10; bottom = 0; right = 10; left = 0},
-      PNoeud(
+      PNode(
         {x = 3; y = 9},
         {top = 10; bottom = 5; right = 5; left = 0},
         PEmpty, PEmpty, PEmpty, PEmpty),
       PEmpty,
-      PNoeud(
+      PNode(
         {x = 1; y = 2},
         {top = 5; bottom = 0; right = 5; left = 0},
         PEmpty, PEmpty, PEmpty, PEmpty),
       PEmpty
     ) in
   if
-    not ((ppath p {x=3; y=9}) = ["NO"]) ||
-    not ((ppath p {x=1; y=2}) = ["SO"]) ||
+    not ((ppath p {x=3; y=9}) = ["NW"]) ||
+    not ((ppath p {x=1; y=2}) = ["SW"]) ||
     not ((ppath p {x=0; y=0}) = [])
   then false else true
 ;;
