@@ -87,23 +87,34 @@ let test_ppath () =
   then false else true
 ;;
 
+let test_get_rect_squ () =
+  let r = {bottom=0; left=0; right=10; top=10} in
+  if
+    not ((get_rect_squ r 1) = {top = 10; bottom = 5; right = 5; left = 0}) ||
+    not ((get_rect_squ r 2) = {top = 10; bottom = 5; right = 10; left = 5}) ||
+    not ((get_rect_squ r 3) = {top = 5; bottom = 0; right = 5; left = 0})
+  then false else true
+;;
 
-let run_test_func func =
-  if func () then print_string "OK\n" else print_string "NOT OK\n"
+
+let run_test_func name_and_func =
+  let (func_name, func) = name_and_func in
+  print_string func_name;
+  print_string ": ";
+  if func ()
+  then begin print_string "OK\n"; true end
+  else begin print_string "NOT OK\n"; false end
 ;;
 
 let run_tests () =
-  print_string "test_new_pquadtree : ";
-  run_test_func test_new_pquadtree;
-  print_string "test_get_center : ";
-  run_test_func test_get_center;
-  print_string "test_out_rect : ";
-  run_test_func test_out_rect;
-  print_string "test_get_squ_num_pt : ";
-  run_test_func test_get_squ_num_pt;
-  print_string "test_pbelong : ";
-  run_test_func test_pbelong;
-  print_string "test_ppath : ";
-  run_test_func test_ppath
+  let test_funcs = [
+    ("test_new_pquadtree", test_new_pquadtree);
+    ("test_get_center", test_get_center);
+    ("test_out_rect", test_out_rect);
+    ("test_get_squ_num_pt", test_get_squ_num_pt);
+    ("test_pbelong", test_pbelong);
+    ("test_ppath", test_ppath);
+    ("test_new_pquadtree", test_new_pquadtree)
+  ] in
+  List.map run_test_func test_funcs
 ;;
-
