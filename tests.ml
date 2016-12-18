@@ -4,13 +4,13 @@ open Pqt;;
 let test_new_pquadtree () =
   let a = new_pquadtree 10 in
   match a with
-    | PNode(p, r, p1, p2, p3, p4) ->
+    | PNode(p, r, pqt1, pqt2, pqt3, pqt4) ->
       if not (p = {x = 0; y = 0}) ||
          not (r = {left=0; bottom=0; top=10; right=10}) ||
-         not (p1 = PEmpty) ||
-         not (p2 = PEmpty) ||
-         not (p3 = PEmpty) ||
-         not (p4 = PEmpty)
+         not (pqt1 = PEmpty) ||
+         not (pqt2 = PEmpty) ||
+         not (pqt3 = PEmpty) ||
+         not (pqt4 = PEmpty)
       then false else true
     | _ -> false
 ;;
