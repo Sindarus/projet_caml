@@ -34,6 +34,17 @@ module Rqt =
       in
       aux rqt (new_rect support_size 0 0 support_size)
 
+    let rec inverse_rqt rqt =
+      match rqt with
+        | Uni(c) ->
+          if c = White
+          then Uni(Black) else Uni(White)
+        | RQ(rqt1, rqt2, rqt3, rqt4) ->
+          RQ(inverse_rqt rqt1,
+             inverse_rqt rqt2,
+             inverse_rqt rqt3,
+             inverse_rqt rqt4)
+
   end
 ;;
 
@@ -46,4 +57,14 @@ let test_draw_rqt () =
     RQ(Uni White, Uni Black, Uni White, Uni Black)
   ) in
   draw_rqt a 512
+;;
+
+let test_inverse_rqt () =
+  let a = RQ(
+    Uni Black,
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni White, Uni Black)
+  ) in
+  inverse_rqt a
 ;;
