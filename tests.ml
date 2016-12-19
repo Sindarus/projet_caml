@@ -5,8 +5,8 @@ let test_new_pquadtree () =
   let a = new_pquadtree 10 in
   match a with
     | PNode(p, r, pqt1, pqt2, pqt3, pqt4) ->
-      if not (p = {x = 0; y = 0}) ||
-         not (r = {left=0; bottom=0; top=10; right=10}) ||
+      if not (p = new_point 0 0) ||
+         not (r = new_rect 10 0 0 10) ||
          not (pqt1 = PEmpty) ||
          not (pqt2 = PEmpty) ||
          not (pqt3 = PEmpty) ||
@@ -16,27 +16,27 @@ let test_new_pquadtree () =
 ;;
 
 let test_get_center () =
-  let r = {left=0; bottom=0; top=10; right=10} in
+  let r = new_rect 20 10 10 20 in
   let c = get_center r in
-  if not (c = {x = 5; y = 5}) then false else true
+  if not (c = new_point 15 15) then false else true
 ;;
 
 let test_out_rect () =
-  let r = {left=0; bottom=0; top=10; right=10} in
+  let r = new_rect 10 0 0 10 in
   if
-    not (out_rect r {x=(-1); y=0}) ||
-    not (out_rect r {x=10; y=11})
+    not (out_rect r (new_point (-1) 0)) ||
+    not (out_rect r (new_point 10 11))
   then false else true
 ;;
 
 let test_get_squ_num_pt () =
   let p = new_pquadtree 10 in
   if
-    not ((get_squ_num_pt p {x=1; y=1}) = 3) ||
-    not ((get_squ_num_pt p {x=9; y=9}) = 2) ||
-    not ((get_squ_num_pt p {x=1; y=9}) = 1) ||
-    not ((get_squ_num_pt p {x=9; y=1}) = 4) ||
-    not ((get_squ_num_pt p {x=11; y=5}) = 0)
+    not ((get_squ_num_pt p (new_point 1 1)) = 3) ||
+    not ((get_squ_num_pt p (new_point 9 9)) = 2) ||
+    not ((get_squ_num_pt p (new_point 1 9)) = 1) ||
+    not ((get_squ_num_pt p (new_point 9 1)) = 4) ||
+    not ((get_squ_num_pt p (new_point 11 5)) = 0)
   then false else true
 ;;
 
@@ -96,6 +96,32 @@ let test_get_rect_squ () =
   then false else true
 ;;
 
+let test_insert () =
+  let pqt = new_pquadtree 10 in
+  let pqt = insert pqt {x=1; y=1} in
+  let pqt = insert pqt {x=2; y=2} in
+  let pqt = insert pqt {x=1; y=9} in
+  if not (pqt =
+    PNode ({x = 0; y = 0}, {top = 10; bottom = 0; right = 10; left = 0},
+      PNode ({x = 1; y = 9}, {top = 10; bottom = 5; right = 5; left = 0}, PEmpty, PEmpty, PEmpty, PEmpty),
+      PEmpty,
+      PNode ({x = 1; y = 1}, {top = 5; bottom = 0; right = 5; left = 0},
+        PEmpty,
+        PNode ({x = 2; y = 2}, {top = 5; bottom = 2; right = 5; left = 2}, PEmpty, PEmpty, PEmpty, PEmpty),
+        PEmpty,
+        PEmpty),
+      PEmpty)
+  ) then false else true
+;;
+
+let test_draw_pqt () =
+  let pqt = new_pquadtree 100 in
+  let pqt = insert pqt {x=10; y=10} in
+  let pqt = insert pqt {x=20; y=20} in
+  let pqt = insert pqt {x=10; y=90} in
+  draw_pqt pqt
+;;
+
 
 let run_test_func name_and_func =
   let (func_name, func) = name_and_func in
@@ -114,7 +140,9 @@ let run_tests () =
     ("test_get_squ_num_pt", test_get_squ_num_pt);
     ("test_pbelong", test_pbelong);
     ("test_ppath", test_ppath);
-    ("test_new_pquadtree", test_new_pquadtree)
+    ("test_new_pquadtree", test_new_pquadtree);
+    ("test_get_rect_squ", test_get_rect_squ);
+    ("test_insert", test_insert)
   ] in
   List.map run_test_func test_funcs
 ;;

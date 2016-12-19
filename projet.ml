@@ -1,3 +1,6 @@
+#load "graphics.cma";;
+open Graphics;;
+
 module Pqt =
   struct
     type rect = {top : int; bottom : int; right : int; left : int}
@@ -8,15 +11,25 @@ module Pqt =
       | PEmpty
       | PNode of point * rect * pquadtree * pquadtree * pquadtree * pquadtree
 
+    (* Syntaxic sugar *)
+    let new_point = fun px py ->
+      {x=px; y=py}
+
+    (* Syntaxic sugar *)
+    let new_rect = fun rtop rbottom rleft rright ->
+      {top=rtop; bottom=rbottom; right=rright; left=rleft}
+
     (* Returns a pquadtree that has n*n for support rectangle *)
     let new_pquadtree = fun n ->
-      PNode({x=0; y=0},
-           {left=0; bottom=0; top=n; right=n},
-           PEmpty, PEmpty, PEmpty, PEmpty)
+      PNode(new_point 0 0,
+            new_rect n 0 0 n,
+            PEmpty, PEmpty, PEmpty, PEmpty)
 
     (* Takes a 'rect' and returns the central point of that rectangle *)
     let get_center = fun r ->
-      {x = (r.right - r.left) / 2 ; y = (r.top - r.bottom) / 2}
+      new_point
+        ((r.right - r.left) / 2 + r.left)
+        ((r.top - r.bottom) / 2 + r.bottom)
 
     (* Returns true if point is outside the rect rectangle *)
     let out_rect = fun rect point ->
@@ -41,7 +54,7 @@ module Pqt =
             | x when x < center.x -> ( match point.y with
               | y when y < center.y -> 3
               | y           -> 1 )
-            | x           -> ( match point.y with
+            | x                   -> ( match point.y with
               | y when y < center.y -> 4
               | y           -> 2 )
 
@@ -76,7 +89,8 @@ module Pqt =
             | 4 -> "NE" :: (ppath pqt4 point)
             | _ -> failwith "ppath: not possible"
 
-    (* Get the squ'th square of rect, where squ is a number between 1 and 4 *)
+    (* Get (as a rect) the squ'th square of rect, where squ is a number
+       between 1 and 4 *)
     let get_rect_squ = fun rect squ ->
       let c = get_center rect in
       match squ with
@@ -110,6 +124,35 @@ module Pqt =
             | 4 when pqt4 = PEmpty -> PNode(p, r, pqt1, pqt2, pqt3, new_node (point) (get_rect_squ r 4))
             | 4 -> PNode(p, r, pqt1, pqt2, pqt3, insert pqt4 point)
             | _ -> failwith "insert: Not possible"
+
+    (* Converts the rect format to (x, y, w, h) where x y are the coordinates
+       of the lower left point and w and h are the width and height of the rect *)
+    let rect_to_xywh = fun rect ->
+      let {top=rtop; bottom=rbottom; left=rleft; right=rright} = rect in
+      (rleft, rbottom, rright-rleft, rtop-rbottom);;
+
+    (* Draws a rect on screen. Graph must be opened already. *)
+    let draw_my_rect = fun r ->
+      let (x, y, w, h) = rect_to_xywh r in
+      draw_rect x y w h
+
+    (* Draws a pqt on screen. *)
+    let draw_pqt = fun pqt ->
+      open_graph "";
+      let rec aux = fun pqt ->
+        match pqt with
+          | PEmpty -> ();
+          | PNode(p, r, pqt1, pqt2, pqt3, pqt4) ->
+            draw_my_rect (get_rect_squ r 1);
+            draw_my_rect (get_rect_squ r 2);
+            draw_my_rect (get_rect_squ r 3);
+            draw_my_rect (get_rect_squ r 4);
+            aux pqt1;
+            aux pqt2;
+            aux pqt3;
+            aux pqt4
+      in aux pqt
+
   end;;
 
 (* tests *)
