@@ -47,24 +47,3 @@ module Rqt =
 
   end
 ;;
-
-open Rqt;;
-let test_draw_rqt () =
-  let a = RQ(
-    Uni Black,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
-  ) in
-  draw_rqt a 512
-;;
-
-let test_inverse_rqt () =
-  let a = RQ(
-    Uni Black,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
-  ) in
-  inverse_rqt a
-;;
