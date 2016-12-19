@@ -25,6 +25,19 @@ module Pqt =
             new_rect n 0 0 n,
             PEmpty, PEmpty, PEmpty, PEmpty)
 
+    (* Returns x to the power p *)
+    let rec pow x p =
+    match p with
+        | 0 -> 1
+        | i when i > 0 -> x * (pow x (p-1))
+        | _ -> failwith "Invalid_Input"
+    ;;
+
+    (* Returns a pquadtree that has 2^k x 2^k support rectangle *)
+    let new_pquadtree_pow2 = fun k ->
+      new_pquadtree (pow 2 k)
+    ;;
+
     (* Takes a 'rect' and returns the central point of that rectangle *)
     let get_center = fun r ->
       new_point
