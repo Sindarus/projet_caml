@@ -1,4 +1,4 @@
-#use "projet.ml";;
+#use "pquadtree.ml";;
 open Pqt;;
 
 let test_new_pquadtree () =
