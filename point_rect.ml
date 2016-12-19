@@ -46,5 +46,9 @@ module Point_rect =
       let (x, y, w, h) = rect_to_xywh r in
       draw_rect x y w h
 
+    let fill_my_rect = fun r ->
+      let (x, y, w, h) = rect_to_xywh r in
+      fill_rect x y w h
+
   end
 ;;
