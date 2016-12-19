@@ -1,6 +1,10 @@
 #use "pquadtree.ml";;
 open Pqt;;
 
+#use "unit_testing.ml";;
+open UnitTesting;;
+
+(* SELF-VALIDATED TESTS *)
 let test_new_pquadtree () =
   let a = new_pquadtree 10 in
   match a with
@@ -114,35 +118,26 @@ let test_insert () =
   ) then false else true
 ;;
 
+(* Gather tests and run them *)
+let test_funcs = [
+  ("test_new_pquadtree", test_new_pquadtree);
+  ("test_get_center", test_get_center);
+  ("test_out_rect", test_out_rect);
+  ("test_get_squ_num_pt", test_get_squ_num_pt);
+  ("test_pbelong", test_pbelong);
+  ("test_ppath", test_ppath);
+  ("test_new_pquadtree", test_new_pquadtree);
+  ("test_get_rect_squ", test_get_rect_squ);
+  ("test_insert", test_insert)
+] in
+run_tests test_funcs;;
+
+(* NON SELF-VALIDATEd TESTS *)
+(* to run and validate by hand *)
 let test_draw_pqt () =
   let pqt = new_pquadtree 100 in
   let pqt = insert pqt {x=10; y=10} in
   let pqt = insert pqt {x=20; y=20} in
   let pqt = insert pqt {x=10; y=90} in
   draw_pqt pqt
-;;
-
-
-let run_test_func name_and_func =
-  let (func_name, func) = name_and_func in
-  print_string func_name;
-  print_string ": ";
-  if func ()
-  then begin print_string "OK\n"; true end
-  else begin print_string "NOT OK\n"; false end
-;;
-
-let run_tests () =
-  let test_funcs = [
-    ("test_new_pquadtree", test_new_pquadtree);
-    ("test_get_center", test_get_center);
-    ("test_out_rect", test_out_rect);
-    ("test_get_squ_num_pt", test_get_squ_num_pt);
-    ("test_pbelong", test_pbelong);
-    ("test_ppath", test_ppath);
-    ("test_new_pquadtree", test_new_pquadtree);
-    ("test_get_rect_squ", test_get_rect_squ);
-    ("test_insert", test_insert)
-  ] in
-  List.map run_test_func test_funcs
 ;;
