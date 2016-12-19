@@ -45,5 +45,28 @@ module Rqt =
              inverse_rqt rqt3,
              inverse_rqt rqt4)
 
+    let rec inter_rqt rqta rqtb =
+      match (rqta, rqtb) with
+        | (Uni(White), _) -> Uni(White)
+        | (_, Uni(White)) -> Uni(White)
+        (* From here on, we know rqta and rqtb are not White *)
+        | (Uni(Black), Uni(Black)) ->
+          Uni(Black)
+        | (Uni(Black), RQ(rqt1, rqt2, rqt3, rqt4)) ->
+          RQ(inter_rqt (Uni(Black)) rqt1,
+             inter_rqt (Uni(Black)) rqt2,
+             inter_rqt (Uni(Black)) rqt3,
+             inter_rqt (Uni(Black)) rqt4)
+        | (RQ(rqt1, rqt2, rqt3, rqt4), Uni(Black)) ->
+          RQ(inter_rqt (Uni(Black)) rqt1,
+             inter_rqt (Uni(Black)) rqt2,
+             inter_rqt (Uni(Black)) rqt3,
+             inter_rqt (Uni(Black)) rqt4)
+        | (RQ(rqta1, rqta2, rqta3, rqta4), RQ(rqtb1, rqtb2, rqtb3, rqtb4)) ->
+          RQ(inter_rqt rqta1 rqtb1,
+             inter_rqt rqta2 rqtb2,
+             inter_rqt rqta3 rqtb3,
+             inter_rqt rqta4 rqtb4)
+
   end
 ;;
