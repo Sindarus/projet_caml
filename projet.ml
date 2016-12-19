@@ -49,14 +49,13 @@ module Pqt =
       match tree with
         | PEmpty -> 0
         | PNode(p, r, pqt1, pqt2, pqt3, pqt4) when (out_rect r point) -> 0
-        | PNode(p, r, pqt1, pqt2, pqt3, pqt4) -> let center = (get_center r) in
-          match point.x with
-            | x when x < center.x -> ( match point.y with
-              | y when y < center.y -> 3
-              | y           -> 1 )
-            | x                   -> ( match point.y with
-              | y when y < center.y -> 4
-              | y           -> 2 )
+        | PNode(p, r, pqt1, pqt2, pqt3, pqt4) ->
+          let center = (get_center r) in
+          if point.x < center.x
+          then
+            (if point.y < center.y then 3 else 1)
+          else
+            (if point.y < center.y then 4 else 2)
 
     (* Returns true if the point is a value of tree.
        Careful : this is different from knowing whether the point is supported
