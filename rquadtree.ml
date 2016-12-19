@@ -2,7 +2,7 @@
 open Graphics;;
 
 #use "point_rect.ml";;
-open Point_rect;;
+open PointRect;;
 
 module Rqt =
   struct

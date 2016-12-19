@@ -1,4 +1,4 @@
-module Point_rect =
+module PointRect =
   struct
     type rect = {top : int; bottom : int; right : int; left : int}
     type point = {x : int; y : int}
