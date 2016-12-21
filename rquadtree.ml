@@ -11,7 +11,7 @@ module Rqt =
       | Black
 
     type rquadtree =
-      | Uni of colour
+      | Plain of colour
       | RQ of rquadtree * rquadtree * rquadtree * rquadtree
 
     (* Draws a rqt on screen. *)
@@ -19,7 +19,7 @@ module Rqt =
       open_graph "";
       let rec aux rqt support_rect =
         match rqt with
-          | Uni(c) ->
+          | Plain(c) ->
             (if c = White then set_color white else set_color black);
             fill_my_rect support_rect
           | RQ(rqt1, rqt2, rqt3, rqt4) ->
@@ -39,9 +39,9 @@ module Rqt =
        black becomes white and vice versa. *)
     let rec inverse_rqt rqt =
       match rqt with
-        | Uni(c) ->
+        | Plain(c) ->
           if c = White
-          then Uni(Black) else Uni(White)
+          then Plain(Black) else Plain(White)
         | RQ(rqt1, rqt2, rqt3, rqt4) ->
           RQ(inverse_rqt rqt1,
              inverse_rqt rqt2,
@@ -53,33 +53,33 @@ module Rqt =
        are black. *)
     let rec inter_rqt rqta rqtb =
       match (rqta, rqtb) with
-        | (Uni(White), _) -> Uni(White)
-        | (_, Uni(White)) -> Uni(White)
+        | (Plain(White), _) -> Plain(White)
+        | (_, Plain(White)) -> Plain(White)
         (* From here on, we know rqta and rqtb are not White *)
-        | (Uni(Black), Uni(Black)) ->
-          Uni(Black)
-        | (Uni(Black), RQ(rqt1, rqt2, rqt3, rqt4)) ->
-          let c = RQ(inter_rqt (Uni(Black)) rqt1,
-                     inter_rqt (Uni(Black)) rqt2,
-                     inter_rqt (Uni(Black)) rqt3,
-                     inter_rqt (Uni(Black)) rqt4)
-          in if c = RQ(Uni White, Uni White, Uni White, Uni White)
+        | (Plain(Black), Plain(Black)) ->
+          Plain(Black)
+        | (Plain(Black), RQ(rqt1, rqt2, rqt3, rqt4)) ->
+          let c = RQ(inter_rqt (Plain(Black)) rqt1,
+                     inter_rqt (Plain(Black)) rqt2,
+                     inter_rqt (Plain(Black)) rqt3,
+                     inter_rqt (Plain(Black)) rqt4)
+          in if c = RQ(Plain White, Plain White, Plain White, Plain White)
           (* This should only be true if rqtb is not normalized *)
-          then Uni White else c
-        | (RQ(rqt1, rqt2, rqt3, rqt4), Uni(Black)) ->
-          let c = RQ(inter_rqt (Uni(Black)) rqt1,
-                     inter_rqt (Uni(Black)) rqt2,
-                     inter_rqt (Uni(Black)) rqt3,
-                     inter_rqt (Uni(Black)) rqt4)
-          in if c = RQ(Uni White, Uni White, Uni White, Uni White)
-          then Uni White else c
+          then Plain White else c
+        | (RQ(rqt1, rqt2, rqt3, rqt4), Plain(Black)) ->
+          let c = RQ(inter_rqt (Plain(Black)) rqt1,
+                     inter_rqt (Plain(Black)) rqt2,
+                     inter_rqt (Plain(Black)) rqt3,
+                     inter_rqt (Plain(Black)) rqt4)
+          in if c = RQ(Plain White, Plain White, Plain White, Plain White)
+          then Plain White else c
         | (RQ(rqta1, rqta2, rqta3, rqta4), RQ(rqtb1, rqtb2, rqtb3, rqtb4)) ->
           let c = RQ(inter_rqt rqta1 rqtb1,
                      inter_rqt rqta2 rqtb2,
                      inter_rqt rqta3 rqtb3,
                      inter_rqt rqta4 rqtb4)
-          in if c = RQ(Uni White, Uni White, Uni White, Uni White)
-          then Uni White else c
+          in if c = RQ(Plain White, Plain White, Plain White, Plain White)
+          then Plain White else c
 
     (* Returns the rqt union of rqta and rqtb *)
     let rec union_rqt rqta rqtb =
@@ -89,7 +89,7 @@ module Rqt =
        its children *)
     let rec rearrange_rqt rqt permut_func =
       match rqt with
-        | Uni(c) -> Uni(c)
+        | Plain(c) -> Plain(c)
         | RQ(rqt1, rqt2, rqt3, rqt4) ->
           let (a, b, c, d) = permut_func (rqt1, rqt2, rqt3, rqt4)
           in RQ(rearrange_rqt a permut_func,
@@ -114,7 +114,7 @@ module Rqt =
     (* Returns a string representing the rqt *)
     let rec code_rqt rqt =
       match rqt with
-        | Uni(c) ->
+        | Plain(c) ->
           if c = Black then "11" else "10"
         | RQ(rqt1, rqt2, rqt3, rqt4) ->
           String.concat "" [ "0";
@@ -134,8 +134,8 @@ module Rqt =
         match str.[0] with
           | '1' ->
             if str.[1] = '0'
-            then (Uni White, str_wo_first_n str 2)
-            else (Uni Black,  str_wo_first_n str 2)
+            then (Plain White, str_wo_first_n str 2)
+            else (Plain Black,  str_wo_first_n str 2)
           | '0' ->
             let r0 = str_wo_first_n str 1 in
             let (rqt1, r1) = aux r0 in

@@ -7,18 +7,18 @@ open Rqt;;
 (* SELF-VALIDATED TESTS *)
 let test_inverse_rqt () =
   let a = RQ(
-    Uni Black,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
+    Plain Black,
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain White, Plain Black)
   ) in
   if not (
     (inverse_rqt a) =
       RQ(
-        Uni White,
-        Uni Black,
-        Uni Black,
-        RQ(Uni Black, Uni White, Uni Black, Uni White)
+        Plain White,
+        Plain Black,
+        Plain Black,
+        RQ(Plain Black, Plain White, Plain Black, Plain White)
       )
   )
   then false else true
@@ -26,88 +26,88 @@ let test_inverse_rqt () =
 
 let test_inter_rqt () =
   let a = RQ(
-    RQ(Uni Black, Uni White, Uni Black, Uni White),
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
+    RQ(Plain Black, Plain White, Plain Black, Plain White),
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain White, Plain Black)
   ) in
   let b = RQ(
-    RQ(Uni White, Uni Black, Uni White, Uni Black),
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni White, Uni Black, Uni Black)
+    RQ(Plain White, Plain Black, Plain White, Plain Black),
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain White, Plain Black, Plain Black)
   ) in
   if not (
     (inter_rqt a b) = RQ(
-      Uni White,
-      Uni White,
-      Uni White,
-      RQ(Uni White, Uni White, Uni White, Uni Black))
+      Plain White,
+      Plain White,
+      Plain White,
+      RQ(Plain White, Plain White, Plain White, Plain Black))
   ) then false else true
 ;;
 
 let test_union_rqt () =
   let a = RQ(
-    RQ(Uni Black, Uni White, Uni Black, Uni White),
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
+    RQ(Plain Black, Plain White, Plain Black, Plain White),
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain White, Plain Black)
   ) in
   let b = RQ(
-    RQ(Uni White, Uni Black, Uni White, Uni Black),
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni White, Uni Black, Uni Black)
+    RQ(Plain White, Plain Black, Plain White, Plain Black),
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain White, Plain Black, Plain Black)
   ) in
   if not (
     (union_rqt a b) = RQ(
-      Uni Black,
-      Uni White,
-      Uni White,
-      RQ(Uni White, Uni Black, Uni Black, Uni Black))
+      Plain Black,
+      Plain White,
+      Plain White,
+      RQ(Plain White, Plain Black, Plain Black, Plain Black))
   ) then false else true
 ;;
 
 let test_vert_sym_rqt () =
   let a = RQ(
-    Uni White,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+    Plain White,
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain Black, Plain Black)
   ) in
   if not (
     (vert_sym_rqt a) = RQ(
-      Uni White,
-      Uni White,
-      RQ(Uni Black, Uni White, Uni Black, Uni Black),
-      Uni White    
+      Plain White,
+      Plain White,
+      RQ(Plain Black, Plain White, Plain Black, Plain Black),
+      Plain White    
     )
   ) then false else true
 ;;
 
 let test_horiz_sym_rqt () =
   let a = RQ(
-    Uni White,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+    Plain White,
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain Black, Plain Black)
   ) in
   if not (
     (horiz_sym_rqt a) = RQ(
-      Uni White,
-      RQ(Uni Black, Uni Black, Uni White, Uni Black),
-      Uni White,
-      Uni White    
+      Plain White,
+      RQ(Plain Black, Plain Black, Plain White, Plain Black),
+      Plain White,
+      Plain White    
     )
   ) then false else true
 ;;
 
 let test_code_rqt () =
   let a = RQ(
-    Uni White,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+    Plain White,
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain Black, Plain Black)
   ) in
   if not ((code_rqt a) = "0101010010111111")
   then false else true
@@ -117,18 +117,18 @@ let test_uncode_rqt () =
   let a = "01001101011111010111110" in
   if not(
     (uncode_rqt a) = RQ(
-      Uni White,
+      Plain White,
       RQ(
-        Uni Black,
+        Plain Black,
         RQ(
-          Uni White,
-          Uni Black,
-          Uni Black,
-          Uni White),
-        Uni White,
-        Uni Black),
-      Uni Black,
-      Uni White)
+          Plain White,
+          Plain Black,
+          Plain Black,
+          Plain White),
+        Plain White,
+        Plain Black),
+      Plain Black,
+      Plain White)
   ) then false else true
 ;;
 
@@ -149,10 +149,10 @@ run_tests test_funcs;;
 (* to run and validate by hand *)
 let test_draw_rqt () =
   let a = RQ(
-    Uni Black,
-    Uni White,
-    Uni White,
-    RQ(Uni White, Uni Black, Uni White, Uni Black)
+    Plain Black,
+    Plain White,
+    Plain White,
+    RQ(Plain White, Plain Black, Plain White, Plain Black)
   ) in
   draw_rqt a 512
 ;;
