@@ -24,9 +24,91 @@ let test_inverse_rqt () =
   then false else true
 ;;
 
+let test_inter_rqt () =
+  let a = RQ(
+    RQ(Uni Black, Uni White, Uni Black, Uni White),
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni White, Uni Black)
+  ) in
+  let b = RQ(
+    RQ(Uni White, Uni Black, Uni White, Uni Black),
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni White, Uni Black, Uni Black)
+  ) in
+  if not (
+    (inter_rqt a b) = RQ(
+      Uni White,
+      Uni White,
+      Uni White,
+      RQ(Uni White, Uni White, Uni White, Uni Black))
+  ) then false else true
+;;
+
+let test_union_rqt () =
+  let a = RQ(
+    RQ(Uni Black, Uni White, Uni Black, Uni White),
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni White, Uni Black)
+  ) in
+  let b = RQ(
+    RQ(Uni White, Uni Black, Uni White, Uni Black),
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni White, Uni Black, Uni Black)
+  ) in
+  if not (
+    (union_rqt a b) = RQ(
+      Uni Black,
+      Uni White,
+      Uni White,
+      RQ(Uni White, Uni Black, Uni Black, Uni Black))
+  ) then false else true
+;;
+
+let test_vert_sym_rqt () =
+  let a = RQ(
+    Uni White,
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+  ) in
+  if not (
+    (vert_sym_rqt a) = RQ(
+      Uni White,
+      Uni White,
+      RQ(Uni Black, Uni White, Uni Black, Uni Black),
+      Uni White    
+    )
+  ) then false else true
+;;
+
+let test_horiz_sym_rqt () =
+  let a = RQ(
+    Uni White,
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+  ) in
+  if not (
+    (horiz_sym_rqt a) = RQ(
+      Uni White,
+      RQ(Uni Black, Uni Black, Uni White, Uni Black),
+      Uni White,
+      Uni White    
+    )
+  ) then false else true
+;;
+
 (* Gather tests and run them *)
 let test_funcs = [
-  ("test_inverse_rqt", test_inverse_rqt)
+  ("test_inverse_rqt", test_inverse_rqt);
+  ("test_inter_rqt", test_inter_rqt);
+  ("test_union_rqt", test_union_rqt);
+  ("test_vert_sym_rqt", test_vert_sym_rqt);
+  ("test_horiz_sym_rqt", test_horiz_sym_rqt)
 ] in
 run_tests test_funcs;;
 
