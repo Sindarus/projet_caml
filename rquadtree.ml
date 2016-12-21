@@ -14,6 +14,7 @@ module Rqt =
       | Uni of colour
       | RQ of rquadtree * rquadtree * rquadtree * rquadtree
 
+    (* Draws a rqt on screen. *)
     let draw_rqt rqt support_size =
       open_graph "";
       let rec aux rqt support_rect =
@@ -34,6 +35,8 @@ module Rqt =
       in
       aux rqt (new_rect support_size 0 0 support_size)
 
+    (* Returns the inverse of the rqt in argument. Inverse means that
+       black becomes white and vice versa. *)
     let rec inverse_rqt rqt =
       match rqt with
         | Uni(c) ->
@@ -45,6 +48,9 @@ module Rqt =
              inverse_rqt rqt3,
              inverse_rqt rqt4)
 
+    (* Returns the intersection of rqta and rqtb. The intersection of rqta and
+       rqtb is a rqtc such as rqtc is black only and only where rqta AND rqtb
+       are black. *)
     let rec inter_rqt rqta rqtb =
       match (rqta, rqtb) with
         | (Uni(White), _) -> Uni(White)
@@ -75,9 +81,12 @@ module Rqt =
           in if c = RQ(Uni White, Uni White, Uni White, Uni White)
           then Uni White else c
 
+    (* Returns the rqt union of rqta and rqtb *)
     let rec union_rqt rqta rqtb =
       inverse_rqt (inter_rqt (inverse_rqt rqta) (inverse_rqt rqtb))
 
+    (* Returns the result of applying the permut_func permutation to rqt and
+       its children *)
     let rec rearrange_rqt rqt permut_func =
       match rqt with
         | Uni(c) -> Uni(c)
@@ -88,18 +97,21 @@ module Rqt =
                 rearrange_rqt c permut_func,
                 rearrange_rqt d permut_func)
 
+    (* Returns the vertical symetry of rqt *)
     let vert_sym_rqt rqt =
       let permut rqts =
         let(a, b, c, d) = rqts in (b, a, d, c)
       in
       rearrange_rqt rqt permut
 
+    (* Returns the horizontal symetry of rqt *)
     let horiz_sym_rqt rqt =
       let permut rqts =
         let(a, b, c, d) = rqts in (c, d, a, b)
       in
       rearrange_rqt rqt permut
 
+    (* Returns a string representing the rqt *)
     let rec code_rqt rqt =
       match rqt with
         | Uni(c) ->
@@ -116,6 +128,7 @@ module Rqt =
     let str_wo_first_n str n =
       String.sub str n (String.length str - n)
 
+    (* Returns the rqt from a string representation *)
     let uncode_rqt str =
       let rec aux str =
         match str.[0] with
