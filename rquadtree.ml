@@ -100,5 +100,39 @@ module Rqt =
       in
       rearrange_rqt rqt permut
 
+    let rec code_rqt rqt =
+      match rqt with
+        | Uni(c) ->
+          if c = Black then "11" else "10"
+        | RQ(rqt1, rqt2, rqt3, rqt4) ->
+          String.concat "" [ "0";
+            code_rqt rqt1;
+            code_rqt rqt2;
+            code_rqt rqt3;
+            code_rqt rqt4
+          ]
+
+    (* Returns str without the first n characters, where n is an int*)
+    let str_wo_first_n str n =
+      String.sub str n (String.length str - n)
+
+    let uncode_rqt str =
+      let rec aux str =
+        match str.[0] with
+          | '1' ->
+            if str.[1] = '0'
+            then (Uni White, str_wo_first_n str 2)
+            else (Uni Black,  str_wo_first_n str 2)
+          | '0' ->
+            let r0 = str_wo_first_n str 1 in
+            let (rqt1, r1) = aux r0 in
+            let (rqt2, r2) = aux r1 in
+            let (rqt3, r3) = aux r2 in
+            let (rqt4, r4) = aux r3 in
+            (RQ(rqt1, rqt2, rqt3, rqt4), r4)
+          | _ -> failwith "uncode_rqt: string not valid rqt."
+      in let (rqt, r) = aux str
+      in rqt
+
   end
 ;;

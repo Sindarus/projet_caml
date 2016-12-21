@@ -102,13 +102,45 @@ let test_horiz_sym_rqt () =
   ) then false else true
 ;;
 
+let test_code_rqt () =
+  let a = RQ(
+    Uni White,
+    Uni White,
+    Uni White,
+    RQ(Uni White, Uni Black, Uni Black, Uni Black)
+  ) in
+  if not ((code_rqt a) = "0101010010111111")
+  then false else true
+;;
+
+let test_uncode_rqt () =
+  let a = "01001101011111010111110" in
+  if not(
+    (uncode_rqt a) = RQ(
+      Uni White,
+      RQ(
+        Uni Black,
+        RQ(
+          Uni White,
+          Uni Black,
+          Uni Black,
+          Uni White),
+        Uni White,
+        Uni Black),
+      Uni Black,
+      Uni White)
+  ) then false else true
+;;
+
 (* Gather tests and run them *)
 let test_funcs = [
   ("test_inverse_rqt", test_inverse_rqt);
   ("test_inter_rqt", test_inter_rqt);
   ("test_union_rqt", test_union_rqt);
   ("test_vert_sym_rqt", test_vert_sym_rqt);
-  ("test_horiz_sym_rqt", test_horiz_sym_rqt)
+  ("test_horiz_sym_rqt", test_horiz_sym_rqt);
+  ("test_code_rqt", test_code_rqt);
+  ("test_uncode_rqt", test_uncode_rqt)
 ] in
 run_tests test_funcs;;
 
