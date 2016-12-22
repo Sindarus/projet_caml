@@ -1,3 +1,6 @@
+#load "graphics.cma";;
+open Graphics;;
+
 module PointRect =
   struct
     type rect = {top : int; bottom : int; right : int; left : int}
