@@ -30,9 +30,21 @@ let test_insert () =
   ) then false else true
 ;;
 
+let test_rects_around_p () =
+  let a = new_qtree (new_rect 300 0 0 300) in
+  let a = insert_rect a (new_rect 270 180 135 180) in
+  let a = insert_rect a (new_rect 237 210 30 270) in
+  if not (
+    (rects_around_p {x=147; y=225} a) =
+    [{top = 270; bottom = 180; right = 180; left = 135};
+     {top = 237; bottom = 210; right = 270; left = 30}]
+  ) then false else true
+;;
+
 (* Gather tests and run them *)
 let test_funcs = [
   ("test_insert", test_insert);
+  ("test_rects_around_p", test_rects_around_p)
 ] in
 run_tests test_funcs;;
 

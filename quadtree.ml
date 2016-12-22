@@ -87,5 +87,19 @@ module Qtree =
         | Empty -> failwith "insert_rect: this should never happen."
         | Q(r, _, _, _, _, _, _) -> aux qtree rect r
 
+    let rec rects_around_p p qtree =
+      let p_is_in_rect rect =
+        not (out_rect rect p)
+      in
+      match qtree with
+        | Empty -> []
+        | Q(r, lv, lh, q1, q2, q3, q4) ->
+          (List.filter p_is_in_rect lv) @
+          (List.filter p_is_in_rect lh) @
+          rects_around_p p q1 @
+          rects_around_p p q2 @
+          rects_around_p p q3 @
+          rects_around_p p q4
+
   end
 ;;
